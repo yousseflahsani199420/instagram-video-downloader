@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Downloader Pro - With Visual Guide</title>
+    
+    <!-- React CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .instagram-gradient {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        }
+        
+        .instagram-text {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .step-card {
+            transition: all 0.3s ease;
+        }
+        
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .phone-mockup {
+            background: #1a1a1a;
+            border-radius: 40px;
+            padding: 10px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+        
+        .phone-screen {
+            background: #000;
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .instagram-header {
+            background: #fff;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #dbdbdb;
+        }
+        
+        .instagram-post {
+            background: #fff;
+        }
+        
+        .story-ring {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            padding: 3px;
+        }
+        
+        .story-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            background: #ddd;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f09433, #dc2743);
+            transition: width 0.3s ease;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse-ring {
+            position: absolute;
+            border-radius: 50%;
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.8; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .type-badge {
+            transition: all 0.3s ease;
+        }
+        
+        .type-badge:hover {
+            transform: scale(1.05);
+        }
+        
+        .type-badge.selected {
+            ring: 4px;
+            ring-color: #dc2743;
+            transform: scale(1.1);
+        }
+        
+        .download-btn {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(220, 39, 67, 0.4);
+        }
+        
+        .tab-active {
+            border-bottom: 3px solid #dc2743;
+            color: #dc2743;
+        }
+        
+        .guide-arrow {
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Main App Component
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('download');
+
+            return (
+                <div className="min-h-screen py-6 px-4">
+                    <Header />
+                    
+                    {/* Navigation Tabs */}
+                    <div className="max-w-5xl mx-auto mb-6">
+                        <div className="flex justify-center space-x-8 bg-white/20 backdrop-blur-md rounded-full p-2 inline-flex mx-auto w-full md:w-auto">
+                            <button 
+                                onClick={() => setActiveTab('download')}
+                                className={`px-6 py-2 rounded-full font-semibold transition-all ${
+                                    activeTab === 'download' 
+                                    ? 'bg-white text-pink-600 shadow-lg' 
+                                    : 'text-white hover:bg-white/20'
+                                }`}
+                            >
+                                ⬇️ Download
+                            </button>
+                            <button 
+                                onClick={() => setActiveTab('guide')}
+                                className={`px-6 py-2 rounded-full font-semibold transition-all ${
+                                    activeTab === 'guide' 
+                                    ? 'bg-white text-pink-600 shadow-lg' 
+                                    : 'text-white hover:bg-white/20'
+                                }`}
+                            >
+                                📖 How to Copy Link
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="max-w-5xl mx-auto">
+                        {activeTab === 'download' ? (
+                            <>
+                                <DownloadSection />
+                                <SupportedTypes />
+                            </>
+                        ) : (
+                            <VisualGuide />
+                        )}
+                    </div>
+
+                    <Footer />
+                </div>
+            );
+        };
+
+        // Header Component
+        const Header = () => (
+            <header className="text-center mb-8">
+                <div className="inline-block mb-4">
+                    <div className="w-20 h-20 mx-auto instagram-gradient rounded-2xl flex items-center justify-center text-white text-4xl shadow-2xl floating">
+                        📸
+                    </div>
+                </div>
+                <h1 className="text-4xl md:text-6xl font-bold text-white mb-3 drop-shadow-lg">
+                    Instagram Downloader
+                </h1>
+                <p className="text-white/90 text-lg md:text-xl max-w-2xl mx-auto">
+                    Download photos, videos, reels, and stories in HD quality
+                </p>
+            </header>
+        );
+
+        // Download Section
+        const DownloadSection = () => {
+            const [url, setUrl] = useState('');
+            const [type, setType] = useState('auto');
+            const [loading, setLoading] = useState(false);
+            const [downloading, setDownloading] = useState(false);
+            const [progress, setProgress] = useState(0);
+            const [error, setError] = useState('');
+            const [success, setSuccess] = useState('');
+            const [mediaData, setMediaData] = useState(null);
+
+            const pasteFromClipboard = async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    setUrl(text);
+                    setError('');
+                } catch (err) {
+                    setError('Cannot access clipboard. Please paste manually.');
+                }
+            };
+
+            const fetchMedia = async () => {
+                if (!url.trim()) {
+                    setError('Please enter an Instagram URL');
+                    return;
+                }
+
+                if (!url.includes('instagram.com')) {
+                    setError('Please enter a valid Instagram URL');
+                    return;
+                }
+
+                setLoading(true);
+                setError('');
+                setSuccess('');
+                setMediaData(null);
+
+                try {
+                    // Simulate API call - replace with actual API in production
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    
+                    setMediaData({
+                        type: 'video',
+                        thumbnail: 'https://via.placeholder.com/400x400/333/fff?text=Instagram+Video',
+                        url: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                        title: 'Instagram Video',
+                        author: '@username',
+                        quality: ['HD', 'SD']
+                    });
+                    
+                    setSuccess('Media found! Click download to save.');
+                } catch (err) {
+                    setError('Failed to fetch media. Please check the URL and try again.');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const downloadMedia = async () => {
+                if (!mediaData) return;
+
+                setDownloading(true);
+                setProgress(0);
+
+                try {
+                    const response = await fetch(mediaData.url);
+                    const contentLength = response.headers.get('content-length');
+                    const total = parseInt(contentLength, 10) || 0;
+                    
+                    const reader = response.body.getReader();
+                    const stream = new ReadableStream({
+                        start(controller) {
+                            let loaded = 0;
+                            function pump() {
+                                return reader.read().then(({ done, value }) => {
+                                    if (done) {
+                                        controller.close();
+                                        return;
+                                    }
+                                    loaded += value.byteLength;
+                                    if (total) {
+                                        setProgress(Math.round((loaded / total) * 100));
+                                    }
+                                    controller.enqueue(value);
+                                    return pump();
+                                });
+                            }
+                            return pump();
+                        }
+                    });
+
+                    const newResponse = new Response(stream);
+                    const blob = await newResponse.blob();
+                    
+                    const blobUrl = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = blobUrl;
+                    link.download = `instagram_${mediaData.type}_${Date.now()}.mp4`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(blobUrl);
+
+                    setSuccess('✅ Download complete! Check your Downloads folder.');
+                } catch (err) {
+                    setError('Download failed. Opening in new tab...');
+                    window.open(mediaData.url, '_blank');
+                } finally {
+                    setDownloading(false);
+                    setProgress(0);
+                }
+            };
+
+            return (
+                <div className="glass-card rounded-3xl p-6 md:p-10 shadow-2xl mb-8">
+                    {/* URL Input */}
+                    <div className="mb-6">
+                        <label className="block text-gray-700 font-bold mb-3 text-lg">
+                            Paste Instagram Link
+                        </label>
+                        <div className="flex gap-3">
+                            <div className="flex-1 relative">
+                                <input
+                                    type="text"
+                                    value={url}
+                                    onChange={(e) => setUrl(e.target.value)}
+                                    placeholder="https://www.instagram.com/p/ABC123DEF/"
+                                    className="w-full px-5 py-4 border-2 border-gray-200 rounded-2xl focus:border-pink-500 focus:outline-none transition-all text-lg"
+                                    onKeyPress={(e) => e.key === 'Enter' && fetchMedia()}
+                                />
+                                {url && (
+                                    <button 
+                                        onClick={() => setUrl('')}
+                                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                    >
+                                        ✕
+                                    </button>
+                                )}
+                            </div>
+                            <button
+                                onClick={pasteFromClipboard}
+                                className="px-5 py-4 bg-gray-100 hover:bg-gray-200 rounded-2xl transition-colors font-semibold"
+                                title="Paste from clipboard"
+                            >
+                                📋
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Media Type Selector */}
+                    <div className="mb-6">
+                        <label className="block text-gray-700 font-semibold mb-3">
+                            Content Type (Optional)
+                        </label>
+                        <div className="flex gap-3 flex-wrap">
+                            {[
+                                { id: 'auto', icon: '🔍', label: 'Auto Detect' },
+                                { id: 'video', icon: '🎥', label: 'Video' },
+                                { id: 'photo', icon: '📷', label: 'Photo' },
+                                { id: 'reel', icon: '🎬', label: 'Reel' },
+                                { id: 'story', icon: '⏱️', label: 'Story' }
+                            ].map((t) => (
+                                <button
+                                    key={t.id}
+                                    onClick={() => setType(t.id)}
+                                    className={`type-badge px-4 py-2 rounded-full border-2 font-medium text-sm ${
+                                        type === t.id 
+                                        ? 'border-pink-500 bg-pink-50 text-pink-700' 
+                                        : 'border-gray-200 hover:border-pink-300'
+                                    }`}
+                                >
+                                    <span className="mr-1">{t.icon}</span>
+                                    {t.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    {!mediaData && (
+                        <button
+                            onClick={fetchMedia}
+                            disabled={loading}
+                            className="w-full py-4 download-btn text-white font-bold rounded-2xl text-lg flex items-center justify-center gap-3 disabled:opacity-70"
+                        >
+                            {loading ? (
+                                <>
+                                    <div className="spinner"></div>
+                                    <span>Finding media...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span>🔍</span>
+                                    <span>Find Media</span>
+                                </>
+                            )}
+                        </button>
+                    )}
+
+                    {/* Media Preview & Download */}
+                    {mediaData && !downloading && (
+                        <div className="fade-in">
+                            <div className="bg-gradient-to-r from-pink-50 to-purple-50 rounded-2xl p-6 mb-4 border border-pink-200">
+                                <div className="flex items-start gap-4">
+                                    <img 
+                                        src={mediaData.thumbnail} 
+                                        alt="Preview" 
+                                        className="w-24 h-24 object-cover rounded-xl"
+                                    />
+                                    <div className="flex-1">
+                                        <h3 className="font-bold text-gray-800 text-lg">{mediaData.title}</h3>
+                                        <p className="text-gray-600">{mediaData.author}</p>
+                                        <div className="flex gap-2 mt-2">
+                                            <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-semibold">
+                                                {mediaData.type.toUpperCase()}
+                                            </span>
+                                            <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">
+                                                HD Available
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={downloadMedia}
+                                    className="flex-1 py-4 download-btn text-white font-bold rounded-2xl text-lg flex items-center justify-center gap-2"
+                                >
+                                    <span>⬇️</span>
+                                    <span>Download HD</span>
+                                </button>
+                                <button
+                                    onClick={() => setMediaData(null)}
+                                    className="px-6 py-4 bg-gray-100 hover:bg-gray-200 rounded-2xl font-semibold text-gray-700"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Download Progress */}
+                    {downloading && (
+                        <div className="bg-blue-50 rounded-2xl p-8 text-center">
+                            <div className="spinner mx-auto mb-4"></div>
+                            <p className="text-blue-800 font-bold text-lg mb-2">Downloading...</p>
+                            <p className="text-blue-600 mb-4">{progress}% complete</p>
+                            <div className="progress-bar max-w-xs mx-auto">
+                                <div className="progress-fill" style={{width: `${progress}%`}}></div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Messages */}
+                    {error && (
+                        <div className="mt-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r-xl">
+                            <div className="flex items-center gap-2">
+                                <span>⚠️</span>
+                                <span className="font-semibold">{error}</span>
+                            </div>
+                        </div>
+                    )}
+
+                    {success && !downloading && (
+                        <div className="mt-4 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 rounded-r-xl">
+                            <div className="flex items-center gap-2">
+                                <span>✅</span>
+                                <span className="font-semibold">{success}</span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // Visual Guide Component
+        const VisualGuide = () => {
+            const steps = [
+                {
+                    num: 1,
+                    title: "Open Instagram App",
+                    desc: "Find the post, reel, or story you want to download",
+                    icon: "📱"
+                },
+                {
+                    num: 2,
+                    title: "Tap Three Dots",
+                    desc: "Tap the ⋮ (three dots) icon at the top right of the post",
+                    icon: "⋮"
+                },
+                {
+                    num: 3,
+                    title: "Copy Link",
+                    desc: "Tap 'Copy Link' from the menu that appears",
+                    icon: "📋"
+                },
+                {
+                    num: 4,
+                    title: "Paste Here",
+                    desc: "Come back to this website and paste the link",
+                    icon: "🔗"
+                }
+            ];
+
+            return (
+                <div className="glass-card rounded-3xl p-6 md:p-10 shadow-2xl mb-8">
+                    <h2 className="text-3xl font-bold text-center mb-2 instagram-text">
+                        How to Copy Instagram Link
+                    </h2>
+                    <p className="text-center text-gray-600 mb-10">
+                        Follow these simple steps to download any Instagram content
+                    </p>
+
+                    <div className="grid md:grid-cols-2 gap-8 items-center">
+                        {/* Left: Steps */}
+                        <div className="space-y-4">
+                            {steps.map((step, index) => (
+                                <div key={index} className="step-card bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
+                                    <div className="flex items-start gap-4">
+                                        <div className="w-12 h-12 instagram-gradient rounded-xl flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+                                            {step.num}
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-gray-800 text-lg flex items-center gap-2">
+                                                <span>{step.icon}</span>
+                                                {step.title}
+                                            </h3>
+                                            <p className="text-gray-600 mt-1">{step.desc}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Right: Phone Mockup */}
+                        <div className="flex justify-center">
+                            <div className="phone-mockup w-72">
+                                <div className="phone-screen">
+                                    {/* Instagram App UI */}
+                                    <div className="instagram-header">
+                                        <div className="text-xl font-bold instagram-text">Instagram</div>
+                                        <div className="ml-auto flex gap-3">
+                                            <span>❤️</span>
+                                            <span>💬</span>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Story Ring */}
+                                    <div className="p-4 bg-white">
+                                        <div className="story-ring">
+                                            <div className="story-avatar flex items-center justify-center text-2xl">
+                                                👤
+                                            </div>
+                                        </div>
+                                        <p className="text-center text-xs mt-2 text-gray-600">Your Story</p>
+                                    </div>
+
+                                    {/* Post */}
+                                    <div className="instagram-post">
+                                        <div className="flex items-center p-3 border-b border-gray-100">
+                                            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-pink-600 p-0.5">
+                                                <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-xs">
+                                                    👤
+                                                </div>
+                                            </div>
+                                            <span className="ml-2 font-semibold text-sm">username</span>
+                                            <div className="ml-auto relative">
+                                                <span className="text-xl text-gray-600">⋮</span>
+                                                <div className="absolute top-0 right-0 w-8 h-8 bg-pink-500 rounded-full opacity-20 pulse-ring"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="aspect-square bg-gray-200 flex items-center justify-center text-6xl">
+                                            📷
+                                        </div>
+                                        
+                                        <div className="p-3">
+                                            <div className="flex gap-4 text-2xl mb-2">
+                                                <span>❤️</span>
+                                                <span>💬</span>
+                                                <span>✈️</span>
+                                                <span className="ml-auto">🔖</span>
+                                            </div>
+                                            <p className="text-sm">
+                                                <span className="font-semibold">username</span> Beautiful sunset! 🌅
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Menu Overlay */}
+                                    <div className="absolute bottom-20 left-4 right-4 bg-white rounded-xl shadow-2xl p-2">
+                                        <div className="p-3 border-b border-gray-100 text-center font-semibold text-red-500">
+                                            Report
+                                        </div>
+                                        <div className="p-3 border-b border-gray-100 text-center font-semibold">
+                                            Unfollow
+                                        </div>
+                                        <div className="p-3 border-b border-gray-100 text-center font-semibold bg-pink-50 text-pink-600 rounded-lg">
+                                            📋 Copy Link
+                                        </div>
+                                        <div className="p-3 text-center text-gray-500">
+                                            Cancel
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Tips Section */}
+                    <div className="mt-10 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-6 border border-yellow-200">
+                        <h3 className="font-bold text-yellow-800 text-lg mb-3 flex items-center gap-2">
+                            <span>💡</span>
+                            Pro Tips
+                        </h3>
+                        <ul className="space-y-2 text-yellow-700">
+                            <li className="flex items-start gap-2">
+                                <span>•</span>
+                                <span>You can download from public accounts only</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span>•</span>
+                                <span>For stories, copy link before 24 hours expire</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span>•</span>
+                                <span>Reels download in highest available quality</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span>•</span>
+                                <span>Multiple photos in one post? We'll download all!</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            );
+        };
+
+        // Supported Types
+        const SupportedTypes = () => {
+            const types = [
+                { icon: '📷', title: 'Photos', desc: 'Single or carousel' },
+                { icon: '🎥', title: 'Videos', desc: 'Feed videos' },
+                { icon: '🎬', title: 'Reels', desc: 'Short videos' },
+                { icon: '⏱️', title: 'Stories', desc: '24h content' },
+                { icon: '📺', title: 'IGTV', desc: 'Long videos' },
+                { icon: '👤', title: 'Profile Pic', desc: 'HD avatar' }
+            ];
+
+            return (
+                <div className="glass-card rounded-3xl p-6 md:p-8 shadow-2xl mb-8">
+                    <h3 className="text-2xl font-bold text-center mb-6 text-gray-800">
+                        Supports All Instagram Content
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {types.map((type, index) => (
+                            <div key={index} className="bg-white rounded-xl p-4 text-center shadow-md hover:shadow-lg transition-shadow">
+                                <div className="text-3xl mb-2">{type.icon}</div>
+                                <h4 className="font-bold text-gray-800">{type.title}</h4>
+                                <p className="text-sm text-gray-600">{type.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // Footer
+        const Footer = () => (
+            <footer className="text-center text-white/80 text-sm py-6">
+                <p>⚠️ For personal use only. Respect copyright and Instagram's Terms of Service.</p>
+                <p className="mt-2">© 2024 Instagram Downloader Pro. Not affiliated with Instagram.</p>
+            </footer>
+        );
+
+        // Render
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
